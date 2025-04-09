@@ -1,3 +1,5 @@
+(defglobal ?*tamanoFila* = 8)
+
 (deffunction imprimir($?tablero)
 	
 	(printout t crlf "      ")
@@ -20,7 +22,10 @@
 		(printout t "  " ?i " |")
 		;;;;;;;;;;;;;;;;;;;;;;;;
 		;aquí consigo una fila entera del tablero
-		(bind $?fila ..... $?tablero)
+		(bind ?fila_0 (+ (* (- ?i 1) ?*tamanoFila*) 1))
+		(bind ?fila_f (* ?i ?*tamanoFila*))
+		(bind $?fila (subseq$ $?tablero ?fila_0 ?fila_f))
+		; (printout t "Fila: " ?fila_0 ", " ?fila_f crlf)
 		;;;;;;;;;;;;;;;;;;;;;;;
 		(loop-for-count (?j 1 ?*tamanoFila*)
 			(if (eq (nth$ ?j $?fila) _)
