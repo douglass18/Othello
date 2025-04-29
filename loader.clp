@@ -1,0 +1,6 @@
+(deffunction loader ()
+	(load "C:/Users/ErikA/Documents/GitHub/Othello/tablero.clp")
+	(load "C:/Users/ErikA/Documents/GitHub/Othello/reglas.clp")
+	(load "C:/Users/ErikA/Documents/GitHub/Othello/imprimir.clp")
+	(reset)
+)

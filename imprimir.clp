@@ -1,5 +1,3 @@
-(defglobal ?*tamanoFila* = 8)
-
 (deffunction imprimir($?tablero)
 	
 	(printout t crlf "      ")
