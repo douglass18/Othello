@@ -1,39 +1,88 @@
+; CONFIGURACION
+
+(deftemplate configuracion
+	(slot tamano (type INTEGER)) ; 4 / 8
+	(slot o (type SYMBOL)) ; CPU / HUMAN
+	(slot x (type SYMBOL)) ; CPU / HUMAN
+)
+
+(deftemplate juego
+	(slot turno (type SYMBOL))
+	(multislot tablero)
+)
+
+; INICIAL
+
 (deffacts inicio
-	(turno X)
-	(tablero (tablero))
+	(inicial)
+)
+
+(defrule inicial
+	?inicial <- (inicial)
+=>
+	(printout t "Tamaño: 4 / 8" crlf)
+	(bind ?tamano (read))
+	
+	(printout t "Jugador O: cpu / human" crlf)
+	(bind ?o (read))
+	
+	(printout t "Jugador X: cpu / human" crlf)
+	(bind ?x (read))
+	
+	(assert (configuracion (tamano ?tamano) (o ?o) (x ?x)))
+	(retract ?inicial)
+)
+
+(defrule r-configuracion
+	?configuracion <- (configuracion (tamano ?tamano) (o ?o) (x ?x))
+=>
+	(bind ?*tamanoFila* ?tamano)
+	(assert (juego (turno X) (tablero (tablero))))
 )
 
 ; CAMBIAR TURNO
 
-(defrule OtoX
-	?c <- (cambiar-turno)
-	?t <- (turno O)
+(defrule r-OtoX
+	?cambiar <- (cambiar-turno)
+	?juego <- (juego (turno O))
 =>
-	(assert (turno X))
-	(retract ?c ?t)
+	(modify ?juego (turno X))
+	(retract ?cambiar)
 )
 
-(defrule XtoO
+(defrule r-XtoO
 	?cambiar <- (cambiar-turno)
-	?turno <- (turno X)
+	?juego <- (juego (turno X))
 =>
-	(assert (turno O))
-	(retract ?cambiar ?turno)
+	(modify ?juego (turno O))
+	(retract ?cambiar)
 )
 
 ; MOVER
 
-(defrule mover
+(defrule r-mover
 	?mover <- (mover ?x ?y)
 	(turno ?jugador)
-	(tablero ($?tablero))
+	(tablero $?tablero)
 =>
-	(mover (?x ?y ?jugador $?tablero))
+	(mover ?x ?y ?jugador $?tablero)
 	(assert (cambiar-turno))
 	(retract ?mover)
 )
 
-(defrule fuera
-	(mover ?x ?y)
-	...
-)
+;(defrule fuera
+;	?mover <- (mover ?x ?y)
+;	(test (or
+;		(or
+;			(< ?x 1)
+;			(> ?x ?*tamanoFila*)
+;		)
+;		(or
+;			(< ?y 1)
+;			(> ?y ?*tamanoFila*)
+;		)
+;	))
+;=>
+;	(mover ?x ?y ?)
+;	(retract ?mover)
+;)

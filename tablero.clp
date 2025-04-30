@@ -24,12 +24,13 @@
 
 (deffunction tablero ()
 	(switch ?*tamanoFila*
-		(case 4 then (tablero4))
-		(case 8 then (tablero8))
+		(case 4 then (return (tablero4)))
+		(case 8 then (return (tablero8)))
 	)
 )
 
-(deffunction mover (?x ?y ?j)
-	(replace$ )
+(deffunction mover (?x ?y ?jugador $?tablero)
+	(bind ?n (+ ?x (* ?y ?*tamanoFila*)))
+	(replace$ $?tablero ?n ?n ?jugador)
 )
 	

@@ -6,7 +6,15 @@ Seguir estos pasos en el IDE de CLIPS.
 - Escribir en la ventana de diálogo (Dialog Window):
 ```
 (loader)
+```
+Para imprimir:
+```
 (imprimir (tablero))
+```
+Para jugar:
+```
+(run)
+(assert (cambiar-turno))
 ```
 
 ## Edición
