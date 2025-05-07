@@ -1,0 +1,3 @@
+(deffunction minmax (?algo)
+
+)

@@ -14,10 +14,9 @@ Para imprimir:
 Para jugar:
 ```
 (run)
-8
-human
-human
+true
 (assert (cambiar-turno))
+(run)
 ```
 
 ## Edición
