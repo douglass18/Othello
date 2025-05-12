@@ -2,12 +2,14 @@
 
 	(printout t "[LOAD]" crlf)
 	
+	
+	
 	(printout t "[LOADING \"tablero.clp\"]" crlf) 
-	(load "C:/Users/ErikA/Documents/GitHub/Othello/tablero.clp")
+	(load "tablero.clp")
 	(printout t "[LOADING \"imprimir.clp\"]" crlf) 
-	(load "C:/Users/ErikA/Documents/GitHub/Othello/imprimir.clp")
-	(printout t "[LOADING \"reglas.clp\"]" crlf) 
-	(load "C:/Users/ErikA/Documents/GitHub/Othello/reglas.clp")
+	(load "imprimir.clp")
+	(printout t "[LOADING \"reglas.clp\"]" crlf)
+	(load "reglas.clp")
 	
 	(printout t "[RESET]" crlf)
 	

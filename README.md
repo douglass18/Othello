@@ -9,14 +9,12 @@ Seguir estos pasos en el IDE de CLIPS.
 ```
 Para imprimir:
 ```
-(imprimir (tablero))
+(assert (imprimir))
 ```
 Para jugar:
 ```
 (run)
-true
-(assert (cambiar-turno))
-(run)
+TRUE
 ```
 
 ## Edición

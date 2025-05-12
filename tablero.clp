@@ -8,6 +8,16 @@
 		_ _ _ _
 	))
 )
+(deffunction tablero6 ()
+	(return (create$
+		_ _ _ _ _ _
+		_ _ _ _ _ _
+		_ _ O X _ _
+		_ _ X O _ _
+		_ _ _ _ _ _
+		_ _ _ _ _ _
+	))
+)
 (deffunction tablero8 ()
 	(return (create$
 		_ _ _ _ _ _ _ _
@@ -25,10 +35,12 @@
 (deffunction tablero ()
 	(switch ?*tamanoFila*
 		(case 4 then (return (tablero4)))
+		(case 6 then (return (tablero6)))
 		(case 8 then (return (tablero8)))
 	)
 )
 
+; Devuelve la ficha opuesta al jugador
 (deffunction opuesto (?jugador)
 	(switch ?jugador
 		(case O then (return X))
@@ -38,7 +50,14 @@
 
 ; Facilita la conversión de Punto a Índice de multislot
 (deffunction parse-nth (?x ?y)
-	(return (+ ?x (* (- ?y 1) ?*tamanoFila*)))
+	(return (+ ?x (* (- ?y 1) ?*tamanoFila*))) ; x + ((y - 1) * TAMANO_FILA)
+)
+
+; Facilita la conversión de Índice de multislot a Punto
+(deffunction parse-x-y (?nth)
+	(bind ?x (mod ?nth ?*tamanoFila*)) ; nth % TAMANO_FILA
+	(bind ?y (+ (div ?nth ?*tamanoFila*) 1)) ; nth / TAMANO_FILA + 1
+	(return (create$ ?x ?y))
 )
 
 ; Devuelve el símbolo en dado Punto

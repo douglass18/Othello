@@ -115,7 +115,7 @@
 ; IMPRIMIR
 
 (defrule r-imprimir
-	(declare (salience 100))
+	(declare (salience 1))
 	(configuracion (imprimir TRUE))
 	(juego (tablero $?tablero))
 	(imprimir)
@@ -124,7 +124,7 @@
 )
 
 (defrule r-clear-imprimir
-	(declare (salience 100))
+	(declare (salience 1))
 	?imprimir <- (imprimir)
 =>
 	(retract ?imprimir)
@@ -282,3 +282,63 @@
 	(assert (imprimir))
 	(retract ?casilla)
 )
+
+; CPU RELATED FUNCTIONS
+
+(deffunction get-succesors (?jugador $?tablero)
+
+	(bind $?succesors (create$))
+	(bind ?length (length$ $?tablero))
+	
+	(loop-for-count (?casilla 1 ?length)
+	
+		(bind ?x-y (parse-x-y ?casilla))
+		(bind ?x (nth$ 1 ?x-y))
+		(bind ?y (nth$ 2 ?x-y))
+	
+		(if (posicion-valida ?x ?y $?tablero) then
+
+			(bind ?L  (direccion-valida ?x ?y -1  0 ?jugador $?tablero))
+			(bind ?U  (direccion-valida ?x ?y  0 -1 ?jugador $?tablero))
+			(bind ?D  (direccion-valida ?x ?y  0  1 ?jugador $?tablero))
+			(bind ?R  (direccion-valida ?x ?y  1  0 ?jugador $?tablero))
+		
+			(bind ?UL (direccion-valida ?x ?y -1 -1 ?jugador $?tablero))
+			(bind ?DL (direccion-valida ?x ?y -1  1 ?jugador $?tablero))
+			(bind ?DR (direccion-valida ?x ?y  1  1 ?jugador $?tablero))
+			(bind ?UR (direccion-valida ?x ?y  1 -1 ?jugador $?tablero))
+		
+			(bind ?total (+ ?L ?U ?D ?R ?UL ?DL ?DR ?UR))
+			(if (> ?total 0) then
+				(bind $?succesors (insert$ $?succesors (+ (length$ $?succesors) 1) (create$ ?x ?y )))
+			)
+		)
+	)
+	(return $?succesors)
+)
+
+(deffunction is-final (?jugador $?tablero)
+	(return (= (length$ (get-succesors ?jugador $?tablero)) 0))
+)
+
+(deffunction is-victoria (?O ?X ?jugador $?tablero)
+	(switch ?jugador
+		(case O then (return (> ?O ?X)))
+		(case X then (return (< ?O ?X)))
+	)
+)
+
+(defrule r-get-succesors
+	(declare (salience 100))
+	?r-succesors <- (get-succesors)
+	(juego (turno ?jugador) (tablero $?tablero))
+=>
+	(bind $?succesors (get-succesors ?jugador $?tablero))
+	(loop-for-count (?i 1 (div (length$ $?succesors) 2))
+		(bind ?j (* ?i 2))
+		(printout t (nth$ (- ?j 1) $?succesors) "," (nth$ ?j $?succesors) "; ")
+	)
+	(printout t crlf)
+	(retract ?r-succesors)
+)
+
