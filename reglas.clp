@@ -68,20 +68,16 @@
 
 ; Realiza (assert) junto al tipo que se desea
 (deffunction assert-quien (?quien)
-	(if (eq ?quien human) then
-		(assert (human))
-	)
-	(if (eq ?quien cpu) then
-		(assert (cpu))
+	(switch ?quien
+		(case human then (assert (human)))
+		(case cpu then (assert (cpu)))
 	)
 )
 
 (deffunction quien (?jugador ?O ?X)
-	(if (eq ?jugador O) then
-		(return ?O)
-	)
-	(if (eq ?jugador X) then
-		(return ?X)
+	(switch ?jugador
+		(case O then (return ?O))
+		(case X then (return ?X))
 	)
 )
 
@@ -191,89 +187,97 @@
 
 ; REVERTIR
 
+(deffunction revertir-hacia (?juego ?x ?y ?dx ?dy ?cnt ?jugador ?O ?X $?tablero)
+	(switch ?jugador
+		(case O then
+			(bind ?O (+ ?O ?cnt))
+			(bind ?X (- ?X ?cnt)))
+		(case X then
+			(bind ?O (- ?O ?cnt))
+			(bind ?X (+ ?X ?cnt)))
+	)
+	(bind $?tablero (revertir ?x ?y ?dx ?dy ?jugador $?tablero))
+	(modify ?juego (O ?O) (X ?X) (tablero $?tablero))
+)
+
 (defrule r-revertir-L
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (L ?L))
-	(test (> ?L 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (L ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?n-tablero (revertir ?x ?y -1  0 ?jugador $?tablero))
-	(modify ?juego (tablero $?n-tablero))
+	(revertir-hacia ?juego ?x ?y -1 0 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (L 0))
 )
 (defrule r-revertir-U
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (U ?U))
-	(test (> ?U 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (U ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?tablero (revertir ?x ?y  0 -1 ?jugador $?tablero))
-	(modify ?juego (tablero $?tablero))
+	(revertir-hacia ?juego ?x ?y 0 -1 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (U 0))
 )
 (defrule r-revertir-D
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (D ?D))
-	(test (> ?D 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (D ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?tablero (revertir ?x ?y  0  1 ?jugador $?tablero))
-	(modify ?juego (tablero $?tablero))
+	(revertir-hacia ?juego ?x ?y 0 1 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (D 0))
 )
 (defrule r-revertir-R
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (R ?R))
-	(test (> ?R 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (R ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?tablero (revertir ?x ?y  1  0 ?jugador $?tablero))
-	(modify ?juego (tablero $?tablero))
+	(revertir-hacia ?juego ?x ?y 1 0 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (R 0))
 )
 
 (defrule r-revertir-UL
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (UL ?UL))
-	(test (> ?UL 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (UL ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?n-tablero (revertir ?x ?y -1 -1 ?jugador $?tablero))
-	(modify ?juego (tablero $?n-tablero))
+	(revertir-hacia ?juego ?x ?y -1 -1 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (UL 0))
 )
 (defrule r-revertir-DL
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (DL ?DL))
-	(test (> ?DL 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (DL ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?tablero (revertir ?x ?y -1  1 ?jugador $?tablero))
-	(modify ?juego (tablero $?tablero))
+	(revertir-hacia ?juego ?x ?y -1 1 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (DL 0))
 )
 (defrule r-revertir-DR
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (DR ?DR))
-	(test (> ?DR 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (DR ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?tablero (revertir ?x ?y  1  1 ?jugador $?tablero))
-	(modify ?juego (tablero $?tablero))
+	(revertir-hacia ?juego ?x ?y 1 1 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (DR 0))
 )
 (defrule r-revertir-UR
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
-	?casilla <- (casilla (x ?x) (y ?y) (UR ?UR))
-	(test (> ?UR 0))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
+	?casilla <- (casilla (x ?x) (y ?y) (UR ?cnt))
+	(test (> ?cnt 0))
 =>
-	(bind $?tablero (revertir ?x ?y  1 -1 ?jugador $?tablero))
-	(modify ?juego (tablero $?tablero))
+	(revertir-hacia ?juego ?x ?y 1 -1 ?cnt ?jugador ?O ?X $?tablero)
 	(modify ?casilla (UR 0))
 )
 
 ; Revertir final
 (defrule r-revertir
 	(configuracion (imprimir ?imprimir))
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
+	?juego <- (juego (turno ?jugador) (O ?O) (X ?X) (tablero $?tablero))
 	?casilla <- (casilla (x ?x) (y ?y))
 =>
 	(bind $?tablero (cambiar ?x ?y ?jugador $?tablero))
-	
-	(modify ?juego (tablero $?tablero))
+	(switch ?jugador
+		(case O then (bind ?O (+ ?O 1)))
+		(case X then (bind ?X (+ ?X 1)))
+	)
+	(modify ?juego (O ?O) (X ?X) (tablero $?tablero))
 	(assert (cambiar-turno))
 	(assert (imprimir))
 	(retract ?casilla)
