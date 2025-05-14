@@ -31,7 +31,7 @@
 
 ; INICIAL
 
-(deffacts inicio
+(deffacts f-inicio
 	(inicial)
 )
 

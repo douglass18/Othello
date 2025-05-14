@@ -10,7 +10,7 @@
 
 ## INICIAL
 
-facts: (inicial)
+**facts** f-inicio: (inicial)
 
 **rule** r-inicial <= (inicial)
 
@@ -52,12 +52,68 @@ facts: (inicial)
 **rule** r-casilla-no-valida <=	(configuracion (O ?) (X ?)),
 								(mover ? ?),
 								(juego (turno ?) (tablero $?))
-								
+	
+## REVERTIR
+
+**function** revertir-hacia ?juego ?x ?y ?dx ?dy ?cnt ?jugador ?O ?X $?tablero
+
+**rule** r-revertir-% [8] <=	(juego (turno ?) (O ?) (X ?) (tablero $?)),
+							(casilla (x ?) (y ?) (% ?)),
+							(test (> ? 0))
+
+**rule** r-revertir <=	(configuracion (imprimir ?)),
+						(juego (turno ?) (O ?) (X ?) (tablero $?)),
+						(casilla (x ?) (y ?))
+
+## META
+
+**rule** r-is-victoria <=	(declare (salience 20)),
+							(is-victoria)
+							(juego (O ?) (X ?) (tablero $?))
+							(test (= (length$ (get-succesors O $?)) 0))
+							(test (= (length$ (get-succesors X $?)) 0))
+
+**rule** r-not-victoria <=	(declare (salience 20))
+							(is-victoria)
+
+# tablero.clp
+
+**global** tamanoFila = 8
+
+**function** tablero4
+
+**function** tablero8
+
+**function** tablero
+
+**function** opuesto ?jugador
+
+**function** parse-nth ?x ?y
+
+**function** parse-x-y ?nth
+
+**function** obtener ?x ?y $?tablero
+
+**function** cambiar ?x ?y ?jugador $?tablero
+
+**function** fuera ?x ?y $?tablero
+
+**function** posicion-valida ?x ?y $?tablero
+
+**function** direccion-valida ?x ?y ?dx ?dy ?jugador $?tablero
+
+**function** revertir ?x ?y ?dx ?dy ?jugador $?tablero
+
 ## CPU RELATED FUNCTIONS
 
 **function** get-succesors ?jugador $?tablero
 
-**function** is-victoria ?O ?X ?jugador $?tablero
+# loader.clp
 
-**rule** r-get-succesors (salience 10) <=	(get-succesors),
-											(juego (turno ?) (tablero $?))
+**function** loader
+
+# imprimir.clp
+
+**function** imprimir $?tablero
+
+**function** imprimir-succesors $?succesors

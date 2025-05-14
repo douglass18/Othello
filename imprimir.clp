@@ -1,4 +1,4 @@
-(deffunction imprimir($?tablero)
+(deffunction imprimir ($?tablero)
 	
 	(printout t crlf "      ")
 	(loop-for-count (?i 1 ?*tamanoFila*)

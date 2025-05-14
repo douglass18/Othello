@@ -2,12 +2,12 @@
 
 	(printout t "[LOAD]" crlf)
 	
-	
-	
 	(printout t "[LOADING \"tablero.clp\"]" crlf) 
 	(load "tablero.clp")
 	(printout t "[LOADING \"imprimir.clp\"]" crlf) 
 	(load "imprimir.clp")
+	(printout t "[LOADING \"cpu.clp\"]" crlf)
+	(load "cpu.clp")
 	(printout t "[LOADING \"reglas.clp\"]" crlf)
 	(load "reglas.clp")
 	
