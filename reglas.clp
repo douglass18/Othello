@@ -1,9 +1,8 @@
-(defglobal ?*profundidad* = 3)
-
 ; [TEMPLATES]
 
 (deftemplate configuracion
 	(slot tamano (type INTEGER)) ; 4 / 8
+	(slot profundidad (type INTEGER)) ; +
 	(slot O (type SYMBOL)) ; cpu / human
 	(slot X (type SYMBOL)) ; cpu / human
 	(slot imprimir (type SYMBOL)) ; true / false
@@ -45,12 +44,16 @@
 	
 	(if ?por-defecto then
 		(bind ?tamano 4)
-		(bind ?O human)
+		(bind ?profundidad 3)
+		(bind ?O cpu)
 		(bind ?X human)
 		(bind ?imprimir TRUE)
 	else
 		(printout t "Tamaño: 4 / 8" crlf)
 		(bind ?tamano (read))
+		
+		(printout t "Profundidad" crlf)
+		(bind ?profundidad (read))
 	
 		(printout t "Jugador O: cpu / human" crlf)
 		(bind ?O (read))
@@ -62,7 +65,7 @@
 		(bind ?imprimir (read))
 	)
 	
-	(assert (configuracion (tamano ?tamano) (O ?O) (X ?X) (imprimir ?imprimir)))
+	(assert (configuracion (tamano ?tamano) (profundidad ?profundidad) (O ?O) (X ?X) (imprimir ?imprimir)))
 	(retract ?inicial)
 )
 
@@ -168,10 +171,15 @@
 
 (defrule r-cpu
 	?cpu <- (cpu)
+	(configuracion (profundidad ?profundidad))
 	(juego (turno ?jugador) (tablero $?tablero))
 =>
 	(printout t "CPU pensando" crlf)
-	(minmax ?jugador ?*profundidad* TRUE $?tablero)
+	(bind $?next (mejor-movimiento ?jugador ?profundidad $?tablero))
+	(bind ?x (nth$ 1 $?next))
+	(bind ?y (nth$ 2 $?next))
+	(assert (mover ?x ?y))
+	(retract ?cpu)
 )
 
 ; Comprueba si la casilla es valida

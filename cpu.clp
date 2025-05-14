@@ -58,10 +58,12 @@
 (deffunction minmax (?jugador ?profundidad ?esMax $?tablero))
 
 (deffunction max-value (?jugador ?profundidad $?tablero)
-	(bind ?v ?*MIN*) ; 
+	
+	(bind ?v ?*MIN*)
 	(bind $?sucesores (get-succesors ?jugador $?tablero))
 	
 	(loop-for-count (?i 1 (div (length$ $?sucesores) 2))
+	
 		(bind ?x (nth$ (- (* ?i 2) 1) $?sucesores))
 		(bind ?y (nth$ (* ?i 2) $?sucesores))
 		
@@ -72,7 +74,7 @@
 		(bind ?valor (minmax (opuesto ?jugador) (- ?profundidad 1) FALSE $?nuevo-tablero))
 		
 		(bind ?v (max ?v ?valor))
-		)
+	)
 	(return ?v)
 )
 
@@ -108,6 +110,7 @@
 	else
 		(return (min-value ?jugador ?profundidad $?tablero))
 	)
+)
 
 ; El movimiento de la CPU	
 (deffunction mejor-movimiento (?jugador ?profundidad $?tablero)
@@ -133,10 +136,4 @@
 
 	; Lista con la mejor jugada encontrada: (x y)
 	(return (create$ ?mejor-x ?mejor-y))
-)
-
-
-
-
-
 )
