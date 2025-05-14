@@ -1,4 +1,4 @@
-;Constantes globales
+; Constantes globales
 
 (defglobal
 	?*MIN* = -999 ;; 
@@ -10,7 +10,7 @@
 	(bind $?nuevo-tablero (cambiar ?x ?y ?jugador $?tablero))
 	
 	; Revertimos en todas las direcciones posibles
-	(bind ?direcciones (create$ 
+	(bind $?direcciones (create$
 		-1  0  ; L
 		 0 -1  ; U
 		 0  1  ; D
@@ -21,9 +21,9 @@
 		 1 -1  ; UR
 	))
 	
-	(loop-for-count (?i 1 (div (length$ ?direcciones) 2))
-		(bind ?dx (nth$ (- (* ?i 2) 1) ?direcciones))
-		(bind ?dy (nth$ (* ?i 2) ?direcciones))
+	(loop-for-count (?i 1 (div (length$ $?direcciones) 2))
+		(bind ?dx (nth$ (- (* ?i 2) 1) $?direcciones))
+		(bind ?dy (nth$ (* ?i 2) $?direcciones))
 		
 		(if (> (direccion-valida ?x ?y ?dx ?dy ?jugador $?tablero) 0) then
 			(bind $?nuevo-tablero (revertir ?x ?y ?dx ?dy ?jugador $?nuevo-tablero))
@@ -53,21 +53,23 @@
 	)
 )
 
-;Algoritmo MinMax
+; Algoritmo MinMax
+
+(deffunction minmax (?jugador ?profundidad ?esMax $?tablero))
 
 (deffunction max-value (?jugador ?profundidad $?tablero)
 	(bind ?v ?*MIN*) ; 
-	(bind ?sucesores (get-succesors ?jugador $?tablero))
+	(bind $?sucesores (get-succesors ?jugador $?tablero))
 	
-	(loop-for-count (?i 1 (div (length$ ?sucesores) 2))
-		(bind ?x (nth$ (- (* ?i 2) 1) ?sucesores))
-		(bind ?y (nth$ (* ?i 2) ?sucesores))
+	(loop-for-count (?i 1 (div (length$ $?sucesores) 2))
+		(bind ?x (nth$ (- (* ?i 2) 1) $?sucesores))
+		(bind ?y (nth$ (* ?i 2) $?sucesores))
 		
 		; Simular movimiento
-		(bind ?nuevo-tablero (simular-movimiento ?x ?y ?jugador $?tablero))
+		(bind $?nuevo-tablero (simular-movimiento ?x ?y ?jugador $?tablero))
 		
 		; Llamada recursiva
-		(bind ?valor (minmax (opuesto ?jugador) ?nuevo-tablero (- ?profundidad 1) FALSE))
+		(bind ?valor (minmax (opuesto ?jugador) (- ?profundidad 1) FALSE $?nuevo-tablero))
 		
 		(bind ?v (max ?v ?valor))
 		)
@@ -76,28 +78,28 @@
 
 (deffunction min-value (?jugador ?profundidad $?tablero)
 	(bind ?v ?*MAX*) ; 
-	(bind ?sucesores (get-succesors ?jugador $?tablero))
+	(bind $?sucesores (get-succesors ?jugador $?tablero))
 	
-	(loop-for-count (?i 1 (div (length$ ?sucesores) 2))
-		(bind ?x (nth$ (- (* ?i 2) 1) ?sucesores))
-		(bind ?y (nth$ (* ?i 2) ?sucesores))
+	(loop-for-count (?i 1 (div (length$ $?sucesores) 2))
+		(bind ?x (nth$ (- (* ?i 2) 1) $?sucesores))
+		(bind ?y (nth$ (* ?i 2) $?sucesores))
 		
 		; Simular movimiento
-		(bind ?nuevo-tablero (simular-movimiento ?x ?y ?jugador $?tablero))
+		(bind $?nuevo-tablero (simular-movimiento ?x ?y ?jugador $?tablero))
 		
 		; Llamada recursiva
-		(bind ?valor (minmax (opuesto ?jugador) ?nuevo-tablero (- ?profundidad 1) TRUE))
+		(bind ?valor (minmax (opuesto ?jugador) (- ?profundidad 1) TRUE $?nuevo-tablero ))
 		
 		(bind ?v (min ?v ?valor))
 	)
 	(return ?v)
 )
 
-(deffunction minmax (?jugador ?profundidad ?esMax $?tablero )
-	(bind ?sucesores (get-succesors ?jugador $?tablero))
+(deffunction minmax (?jugador ?profundidad ?esMax $?tablero)
+	(bind $?sucesores (get-succesors ?jugador $?tablero))
   
 	; Caso terminal: profundidad 0 o no hay movimientos posibles
-	(if (or (= ?profundidad 0) (= (length$ ?sucesores) 0)) then
+	(if (or (= ?profundidad 0) (= (length$ $?sucesores) 0)) then
 		(return (evaluar-tablero ?jugador $?tablero))
 	)
 	

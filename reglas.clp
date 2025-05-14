@@ -1,3 +1,5 @@
+(defglobal ?*profundidad* = 3)
+
 ; [TEMPLATES]
 
 (deftemplate configuracion
@@ -162,6 +164,14 @@
 	
 	(assert (mover ?x ?y))
 	(retract ?human)
+)
+
+(defrule r-cpu
+	?cpu <- (cpu)
+	(juego (turno ?jugador) (tablero $?tablero))
+=>
+	(printout t "CPU pensando" crlf)
+	(minmax ?jugador ?*profundidad* TRUE $?tablero)
 )
 
 ; Comprueba si la casilla es valida
