@@ -108,4 +108,35 @@
 	else
 		(return (min-value ?jugador ?profundidad $?tablero))
 	)
+
+; El movimiento de la CPU	
+(deffunction mejor-movimiento (?jugador ?profundidad $?tablero)
+	(bind ?mejor-valor ?*MIN*)
+	(bind ?mejor-x -1)
+	(bind ?mejor-y -1)
+
+	(bind $?sucesores (get-succesors ?jugador $?tablero))
+
+	(loop-for-count (?i 1 (div (length$ $?sucesores) 2))
+		(bind ?x (nth$ (- (* ?i 2) 1) $?sucesores))
+		(bind ?y (nth$ (* ?i 2) $?sucesores))
+
+		(bind $?nuevo-tablero (simular-movimiento ?x ?y ?jugador $?tablero))
+		(bind ?valor (minmax (opuesto ?jugador) (- ?profundidad 1) FALSE $?nuevo-tablero))
+
+		(if (> ?valor ?mejor-valor) then
+			(bind ?mejor-valor ?valor)
+			(bind ?mejor-x ?x)
+			(bind ?mejor-y ?y)
+		)
+	)
+
+	; Lista con la mejor jugada encontrada: (x y)
+	(return (create$ ?mejor-x ?mejor-y))
+)
+
+
+
+
+
 )
