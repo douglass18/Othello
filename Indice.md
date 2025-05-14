@@ -68,9 +68,9 @@
 ## META
 
 **rule** r-is-victoria <=	(declare (salience 20)),
-							(is-victoria)
-							(juego (O ?) (X ?) (tablero $?))
-							(test (= (length$ (get-succesors O $?)) 0))
+							(is-victoria),
+							(juego (O ?) (X ?) (tablero $?)),
+							(test (= (length$ (get-succesors O $?)) 0)),
 							(test (= (length$ (get-succesors X $?)) 0))
 
 **rule** r-not-victoria <=	(declare (salience 20))
