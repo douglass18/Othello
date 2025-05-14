@@ -132,4 +132,35 @@
 	
 	(return $?tablero)
 )
+
+; CPU RELATED FUNCTIONS
+
+(deffunction get-succesors (?jugador $?tablero)
+
+	(bind $?succesors (create$))
+	(bind ?length (length$ $?tablero))
 	
+	(loop-for-count (?y 1 ?*tamanoFila*)
+		(loop-for-count (?x 1 ?*tamanoFila*)
+	
+			(if (posicion-valida ?x ?y $?tablero) then
+
+				(bind ?L  (direccion-valida ?x ?y -1  0 ?jugador $?tablero))
+				(bind ?U  (direccion-valida ?x ?y  0 -1 ?jugador $?tablero))
+				(bind ?D  (direccion-valida ?x ?y  0  1 ?jugador $?tablero))
+				(bind ?R  (direccion-valida ?x ?y  1  0 ?jugador $?tablero))
+			
+				(bind ?UL (direccion-valida ?x ?y -1 -1 ?jugador $?tablero))
+				(bind ?DL (direccion-valida ?x ?y -1  1 ?jugador $?tablero))
+				(bind ?DR (direccion-valida ?x ?y  1  1 ?jugador $?tablero))
+				(bind ?UR (direccion-valida ?x ?y  1 -1 ?jugador $?tablero))
+			
+				(bind ?total (+ ?L ?U ?D ?R ?UL ?DL ?DR ?UR))
+				(if (> ?total 0) then
+					(bind $?succesors (insert$ $?succesors (+ (length$ $?succesors) 1) (create$ ?x ?y )))
+				)
+			)
+		)
+	)
+	(return $?succesors)
+)

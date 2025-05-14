@@ -42,7 +42,7 @@
 	(bind ?por-defecto (read))
 	
 	(if ?por-defecto then
-		(bind ?tamano 8)
+		(bind ?tamano 4)
 		(bind ?O human)
 		(bind ?X human)
 		(bind ?imprimir TRUE)
@@ -82,9 +82,11 @@
 )
 
 (defrule r-OtoX
+	(declare (salience 11))
 	?cambiar <- (cambiar-turno)
-	?juego <- (juego (turno O))
+	?juego <- (juego (turno O) (tablero $?tablero))
 	(configuracion (X ?X))
+	(test (> (length$ (get-succesors X $?tablero)) 0))
 =>
 	(assert-quien ?X)
 	(modify ?juego (turno X))
@@ -92,13 +94,23 @@
 )
 
 (defrule r-XtoO
+	(declare (salience 11))
 	?cambiar <- (cambiar-turno)
-	?juego <- (juego (turno X))
+	?juego <- (juego (turno X) (tablero $?tablero))
 	(configuracion (O ?O))
+	(test (> (length$ (get-succesors O $?tablero)) 0))
 =>
 	(assert-quien ?O)
 	(modify ?juego (turno O))
 	(retract ?cambiar)
+)
+
+(defrule r-turno-no-valido
+	(declare (salience 10))
+	(cambiar-turno)
+	?juego <- (juego (turno ?jugador))
+=>
+	(modify ?juego (turno (opuesto ?jugador)))
 )
 
 ; CONFIGURACION
@@ -117,10 +129,15 @@
 (defrule r-imprimir
 	(declare (salience 1))
 	(configuracion (imprimir TRUE))
-	(juego (tablero $?tablero))
+	(juego (turno ?jugador) (tablero $?tablero))
 	(imprimir)
 =>
 	(imprimir $?tablero)
+	
+	(printout t "Turno: " ?jugador crlf)
+	
+	(printout t "Jugadas disponibles: ")
+	(imprimir-succesors (get-succesors ?jugador $?tablero))
 )
 
 (defrule r-clear-imprimir
@@ -129,7 +146,6 @@
 =>
 	(retract ?imprimir)
 )
-
 
 ; MOVER
 
@@ -152,7 +168,7 @@
 (defrule r-casilla-valida
 	(configuracion (O ?O) (X ?X))
 	?mover <- (mover ?x ?y)
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
+	(juego (turno ?jugador) (tablero $?tablero))
 	(test (posicion-valida ?x ?y $?tablero))
 =>
 	(bind ?L  (direccion-valida ?x ?y -1  0 ?jugador $?tablero))
@@ -176,9 +192,9 @@
 )
 
 (defrule r-casilla-no-valida
-(configuracion (O ?O) (X ?X))
+	(configuracion (O ?O) (X ?X))
 	?mover <- (mover ?x ?y)
-	?juego <- (juego (turno ?jugador) (tablero $?tablero))
+	(juego (turno ?jugador) (tablero $?tablero))
 =>
 	(printout t "NO VALIDO" crlf)
 	(assert-quien (quien ?jugador ?O ?X))
@@ -280,65 +296,35 @@
 	(modify ?juego (O ?O) (X ?X) (tablero $?tablero))
 	(assert (cambiar-turno))
 	(assert (imprimir))
+	(assert (is-victoria))
 	(retract ?casilla)
 )
 
-; CPU RELATED FUNCTIONS
+; META
 
-(deffunction get-succesors (?jugador $?tablero)
-
-	(bind $?succesors (create$))
-	(bind ?length (length$ $?tablero))
-	
-	(loop-for-count (?casilla 1 ?length)
-	
-		(bind ?x-y (parse-x-y ?casilla))
-		(bind ?x (nth$ 1 ?x-y))
-		(bind ?y (nth$ 2 ?x-y))
-	
-		(if (posicion-valida ?x ?y $?tablero) then
-
-			(bind ?L  (direccion-valida ?x ?y -1  0 ?jugador $?tablero))
-			(bind ?U  (direccion-valida ?x ?y  0 -1 ?jugador $?tablero))
-			(bind ?D  (direccion-valida ?x ?y  0  1 ?jugador $?tablero))
-			(bind ?R  (direccion-valida ?x ?y  1  0 ?jugador $?tablero))
-		
-			(bind ?UL (direccion-valida ?x ?y -1 -1 ?jugador $?tablero))
-			(bind ?DL (direccion-valida ?x ?y -1  1 ?jugador $?tablero))
-			(bind ?DR (direccion-valida ?x ?y  1  1 ?jugador $?tablero))
-			(bind ?UR (direccion-valida ?x ?y  1 -1 ?jugador $?tablero))
-		
-			(bind ?total (+ ?L ?U ?D ?R ?UL ?DL ?DR ?UR))
-			(if (> ?total 0) then
-				(bind $?succesors (insert$ $?succesors (+ (length$ $?succesors) 1) (create$ ?x ?y )))
-			)
-		)
-	)
-	(return $?succesors)
-)
-
-(deffunction is-final (?jugador $?tablero)
-	(return (= (length$ (get-succesors ?jugador $?tablero)) 0))
-)
-
-(deffunction is-victoria (?O ?X ?jugador $?tablero)
-	(switch ?jugador
-		(case O then (return (> ?O ?X)))
-		(case X then (return (< ?O ?X)))
-	)
-)
-
-(defrule r-get-succesors
-	(declare (salience 100))
-	?r-succesors <- (get-succesors)
-	(juego (turno ?jugador) (tablero $?tablero))
+(defrule r-is-victoria
+	(declare (salience 20))
+	(is-victoria)
+	(juego (O ?O) (X ?X) (tablero $?tablero))
+	(test (= (length$ (get-succesors O $?tablero)) 0))
+	(test (= (length$ (get-succesors X $?tablero)) 0))
 =>
-	(bind $?succesors (get-succesors ?jugador $?tablero))
-	(loop-for-count (?i 1 (div (length$ $?succesors) 2))
-		(bind ?j (* ?i 2))
-		(printout t (nth$ (- ?j 1) $?succesors) "," (nth$ ?j $?succesors) "; ")
+	(if (> ?O ?X) then
+		(printout t "Victoria: O, " ?O " a " ?X crlf)
 	)
-	(printout t crlf)
-	(retract ?r-succesors)
+	(if (< ?O ?X) then
+		(printout t "Victoria: X, " ?X " a " ?O crlf)
+	)
+	(if (= ?O ?X) then
+		(printout t "Empate" crlf)
+	)
+	(halt)
+)
+
+(defrule r-not-victoria
+	(declare (salience 20))
+	?is-victoria <- (is-victoria)
+=>
+	(retract ?is-victoria)
 )
 

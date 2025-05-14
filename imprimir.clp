@@ -40,3 +40,11 @@
 	)
 	(printout t crlf)
 )
+
+(deffunction imprimir-succesors ($?succesors)
+	(loop-for-count (?i 1 (div (length$ $?succesors) 2))
+		(bind ?j (* ?i 2))
+		(printout t (nth$ (- ?j 1) $?succesors) "," (nth$ ?j $?succesors) "; ")
+	)
+	(printout t crlf)
+)
