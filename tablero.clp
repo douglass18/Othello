@@ -78,8 +78,8 @@
 	;y < min || max < y
 	(return
 		(or
-			(or (< ?x 0) (< ?*tamanoFila* ?x))
-			(or (< ?y 0) (< ?*tamanoFila* ?y))
+			(or (< ?x 1) (< ?*tamanoFila* ?x))
+			(or (< ?y 1) (< ?*tamanoFila* ?y))
 		)
 	)
 )
