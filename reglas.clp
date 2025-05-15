@@ -174,12 +174,20 @@
 	(configuracion (profundidad ?profundidad))
 	(juego (turno ?jugador) (tablero $?tablero))
 =>
-	(printout t "CPU pensando" crlf)
+	(printout t "CPU pensando ..." crlf)
+	; Se obtiene el siguiente mov 
 	(bind $?next (mejor-movimiento ?jugador ?profundidad $?tablero))
 	(bind ?x (nth$ 1 $?next))
 	(bind ?y (nth$ 2 $?next))
-	(printout t "CPU mueve a " ?x "," ?y crlf)
-	(assert (mover ?x ?y))
+	
+	; Comprobar si no hay mov valido, en ese caso, cambiar de turno
+    (if (and (= ?x -1) (= ?y -1)) then
+        (printout t "CPU no tiene movimientos validos" crlf)
+    else
+        (printout t "CPU mueve a (" ?x "," ?y ")" crlf)
+        (assert (mover ?x ?y))
+    )
+    
 	(retract ?cpu)
 )
 
