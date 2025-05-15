@@ -108,13 +108,13 @@
 	; - controlar centro: tamanoFila / 4 < ?x,?y < tamanoFila / 4 * 3
 	; - voltear menos en juego temprano: total < tamanoFila ** 2 / 4
 	
-	(if (< ?jugada 60) then
+	(bind ?length (length$ $?tablero))
+	
+	(if (< ?jugada (- ?length 4)) then
 		(bind ?puntuacion (+ ?puntuacion (controlar-esquinas ?jugador $?tablero)))
 	)
-	(if (< ?jugada 16) then
+	(if (< ?jugada (div ?length 4)) then
 		(bind ?puntuacion (+ ?puntuacion (controlar-centro ?jugador $?tablero)))
-	)
-	(if (< ?jugada 16) then
 		(bind ?puntuacion (- ?puntuacion (voltear-mas ?jugador ?O ?X)))
 	else
 		(bind ?puntuacion (+ ?puntuacion (voltear-mas ?jugador ?O ?X)))

@@ -7,15 +7,17 @@ Seguir estos pasos en el IDE de CLIPS.
 ```
 (loader)
 ```
-Para imprimir:
-```
-(assert (imprimir))
-```
 Para jugar:
 ```
 (run)
 TRUE
 ```
+Por defecto:
+- tamano 8
+- profundidad 3
+- O cpu
+- X human
+- imprimir TRUE
 
 ## Edición
 
@@ -40,7 +42,3 @@ Por ejemplo, para crear el tablero 2x2:
 	)
 )
 ```
-
-## Información extra
-
-`Prueba.clp` es un archivo de prueba desaprobado *(no usar)*.

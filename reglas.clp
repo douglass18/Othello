@@ -49,7 +49,7 @@
 		(bind ?X human)
 		(bind ?imprimir TRUE)
 	else
-		(printout t "Tamaño: 4 / 8" crlf)
+		(printout t "Tamaño: 4 / 6 / 8" crlf)
 		(bind ?tamano (read))
 		
 		(printout t "Profundidad" crlf)
