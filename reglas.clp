@@ -43,7 +43,7 @@
 	(bind ?por-defecto (read))
 	
 	(if ?por-defecto then
-		(bind ?tamano 4)
+		(bind ?tamano 8)
 		(bind ?profundidad 3)
 		(bind ?O cpu)
 		(bind ?X human)
@@ -178,6 +178,7 @@
 	(bind $?next (mejor-movimiento ?jugador ?profundidad $?tablero))
 	(bind ?x (nth$ 1 $?next))
 	(bind ?y (nth$ 2 $?next))
+	(printout t "CPU mueve a " ?x "," ?y crlf)
 	(assert (mover ?x ?y))
 	(retract ?cpu)
 )
@@ -336,6 +337,7 @@
 	(if (= ?O ?X) then
 		(printout t "Empate" crlf)
 	)
+	(imprimir $?tablero)
 	(halt)
 )
 

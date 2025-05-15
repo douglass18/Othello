@@ -33,6 +33,60 @@
 	(return $?nuevo-tablero)
 )
 
+(deffunction controlar-esquinas (?jugador $?tablero)
+	(bind ?extra 10)
+	(bind ?puntuacion 0)
+	
+	(switch (obtener 1 1 $?tablero)
+		(case ?jugador then (bind ?puntuacion (+ ?puntuacion ?extra)))
+		(case (opuesto ?jugador) then (bind ?puntuacion (- ?puntuacion ?extra)))
+	)
+	(switch (obtener 1 ?*tamanoFila* $?tablero)
+		(case ?jugador then (bind ?puntuacion (+ ?puntuacion ?extra)))
+		(case (opuesto ?jugador) then (bind ?puntuacion (- ?puntuacion ?extra)))
+	)
+	(switch (obtener ?*tamanoFila* 1 $?tablero)
+		(case ?jugador then (bind ?puntuacion (+ ?puntuacion ?extra)))
+		(case (opuesto ?jugador) then (bind ?puntuacion (- ?puntuacion ?extra)))
+	)
+	(switch (obtener ?*tamanoFila* ?*tamanoFila* $?tablero)
+		(case ?jugador then (bind ?puntuacion (+ ?puntuacion ?extra)))
+		(case (opuesto ?jugador) then (bind ?puntuacion (- ?puntuacion ?extra)))
+	)
+	(return ?puntuacion)
+)
+
+(deffunction controlar-centro (?jugador $?tablero)
+	(bind ?extra 3)
+	(bind ?puntuacion 0)
+
+	(loop-for-count (?y 1 ?*tamanoFila*)
+		(loop-for-count (?x 1 ?*tamanoFila*)
+			
+			(if (and (< (div ?*tamanoFila* 4) ?x) (< ?x (* (div ?*tamanoFila* 4) 3))) then
+				(if (eq ?jugador (obtener ?x ?y $?tablero)) then
+					(bind ?puntuacion (+ ?puntuacion ?extra))
+				)
+			else
+				(if (eq ?jugador (obtener ?x ?y $?tablero)) then
+					(bind ?puntuacion (- ?puntuacion ?extra))
+				)
+			)
+			
+		)
+	)
+	
+	(return ?puntuacion)
+)
+
+(deffunction voltear-mas (?jugador ?O ?X)
+	(switch ?jugador
+		(case O then (bind ?puntuacion (- ?O ?X)))
+		(case X then (bind ?puntuacion (- ?X ?O)))
+	)
+	(return ?puntuacion)
+)
+
 (deffunction evaluar-tablero (?jugador $?tablero)
 	; Función de evaluación simple: diferencia de fichas entre un jugador y otro
 	(bind ?O 0)
@@ -45,12 +99,29 @@
 			(bind ?X (+ ?X 1))
 		)
 	)
-  
-	(if (eq ?jugador O) then
-		(return (- ?O ?X))
-	else
-		(return (- ?X ?O))
+	
+	(bind ?jugada (+ ?O ?X))
+	(bind ?puntuacion 0)
+	
+	; ESTRATEGIAS
+	; - controlar esquinas: 1,1; 1, tamanoFila; tamanoFila, 1; tamanoFila, tamanoFila
+	; - controlar centro: tamanoFila / 4 < ?x,?y < tamanoFila / 4 * 3
+	; - voltear menos en juego temprano: total < tamanoFila ** 2 / 4
+	
+	(if (< ?jugada 60) then
+		(bind ?puntuacion (+ ?puntuacion (controlar-esquinas ?jugador $?tablero)))
 	)
+	(if (< ?jugada 16) then
+		(bind ?puntuacion (+ ?puntuacion (controlar-centro ?jugador $?tablero)))
+	)
+	(if (< ?jugada 16) then
+		(bind ?puntuacion (- ?puntuacion (voltear-mas ?jugador ?O ?X)))
+	else
+		(bind ?puntuacion (+ ?puntuacion (voltear-mas ?jugador ?O ?X)))
+	)
+	
+	(return ?puntuacion)
+	
 )
 
 ; Algoritmo MinMax
